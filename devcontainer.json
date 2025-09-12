@@ -1,0 +1,53 @@
+{
+  "name": "Next.js + Bun (official image)",
+  "image": "oven/bun:1",
+
+  // Use the non-root 'bun' user provided by the image
+  "remoteUser": "bun",
+
+  // Handy ports for Next dev server
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": { "label": "Next.js dev server" }
+  },
+
+  // Quality-of-life: Git + common tooling via features
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": { "version": "latest" }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "yoavbls.pretty-ts-errors"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "files.eol": "\n"
+      }
+    }
+  },
+
+  // Speed up installs/builds
+  "mounts": [
+    // Bun cache
+    "type=volume,source=bun-cache,target=/home/bun/.bun/install/cache",
+    // Optional: Next.js cache (kept outside your repo)
+    "type=volume,source=next-cache,target=${containerWorkspaceFolder}/.next/cache"
+  ],
+
+  "containerEnv": {
+    "NODE_ENV": "development",
+    "NEXT_TELEMETRY_DISABLED": "1"
+  },
+
+  // Auto-install if package.json exists
+  "postCreateCommand": "if [ -f package.json ]; then bun install; fi",
+
+  // Optional: run lint on container start (comment out if you don't want it)
+  "postStartCommand": "if [ -f package.json ]; then bun run -y lint || true; fi"
+}
