@@ -155,13 +155,13 @@ Bun.serve<{ id: string }, any>({
       if (!session) return;
       handleAction(session, parsed as ClientToServer);
     },
-    close(ws) {
+    close(ws, code, reason) {
       const session = (ws as any).data as ClientSession | undefined;
       if (session) {
         clients.delete(session);
         players.delete(session.id);
         broadcastPlayersSnapshot();
-        console.log('Client disconnected', session.id);
+        console.log('Client disconnected', session.id, 'code=', code, 'reason=', reason);
       }
     },
   }

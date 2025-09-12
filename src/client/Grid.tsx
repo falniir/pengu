@@ -14,6 +14,7 @@ const Cell: React.FC<CellProps> = ({ x, y, plant, isHome, isOwnedPlant, isPlayer
   const color = plant ? palette[plant.type] : 'transparent';
   const base = plant ? icons[plant.type] : (showDots ? '·' : '');
   const playerOverlay = isPlayer ? '🧍' : (playersHere.length > 0 ? '👥' : '');
+  const homeTint = !plant && isHome ? 'rgba(56,189,248,0.08)' : undefined; // cyan-ish tint
   return (
     <div
       onClick={e => { e.preventDefault(); onPrimary(); }}
@@ -21,9 +22,11 @@ const Cell: React.FC<CellProps> = ({ x, y, plant, isHome, isOwnedPlant, isPlayer
       style={{
         width: CELL_SIZE, height: CELL_SIZE, boxSizing: 'border-box', position: 'relative',
         fontSize: plant ? 14 : 10, lineHeight: CELL_SIZE + 'px', textAlign: 'center', cursor: 'pointer',
-        background: plant ? color : 'transparent',
+        background: plant ? color : homeTint || 'transparent',
         border: isHome ? '1px solid #334155' : '1px solid #1e293b',
-        outline: isPlayer ? '2px solid #fff' : isOwnedPlant ? '2px solid rgba(255,255,255,0.4)' : 'none',
+        outline: isPlayer ? '2px solid #fef08a' : isOwnedPlant ? '2px solid rgba(255,255,255,0.4)' : 'none',
+        boxShadow: isPlayer ? '0 0 4px 2px rgba(252,211,77,0.6)' : undefined,
+        transition: 'background 120ms',
         userSelect: 'none'
       }}>
       {base}
@@ -73,7 +76,7 @@ export const Grid: React.FC = () => {
         const isHome = home ? (x >= home.x && y >= home.y && x < home.x + home.w && y < home.y + home.h) : false;
         const isPlayer = myPos && x === myPos.x && y === myPos.y;
         const isOwnedPlant = plantData?.owner === playerId;
-        const playersHere = Object.values(players).filter(p => p.x === x && p.y === y && p.id !== playerId).map(p => p.id);
+  const playersHere = (Object.values(players) as any[]).filter((p: any) => p.x === x && p.y === y && p.id !== playerId).map((p: any) => p.id);
         row.push(<Cell key={k} x={x} y={y} plant={plantData} isHome={isHome} isOwnedPlant={isOwnedPlant} isPlayer={!!isPlayer} playersHere={playersHere} showDots={showDots} onPrimary={() => {
           if (plantMode === 'clear') {
             if (plantData && plantData.owner === playerId) clear(x, y);
