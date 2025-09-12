@@ -1,0 +1,41 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/marcosgomesneto/bun-devcontainers/tree/main/src/basic-bun
+{
+  "name": "Bun",
+  "dockerFile": "Dockerfile",
+  // Configure tool-specific properties.
+  "customizations": {
+    // Configure properties specific to VS Code.
+    "vscode": {
+      // Add the IDs of extensions you want installed when the container is created.
+      "extensions": [
+        "oven.bun-vscode",
+		"GitHub.copilot-chat"
+      ]
+    }
+},
+"features": {
+	"ghcr.io/devcontainers/features/common-utils:2": {
+		"installZsh": true,
+		"configureZshAsDefaultShell": true,
+		"installOhMyZsh": true,
+		"installOhMyZshConfig": true,
+		"upgradePackages": true,
+		"username": "devcontainer",
+		"userUid": "1001",
+		"userGid": "1001"
+	},
+	"ghcr.io/nils-geistmann/devcontainers-features/zsh:0": {
+		"defaultUser": true,
+		"setLocale": true,
+		"theme": "agnoster",
+		"plugins": "git docker",
+		"desiredLocale": "en_US.UTF-8 UTF-8"
+	},
+	"ghcr.io/devcontainers-extra/features/zsh-plugins:0": {
+		"plugins": "ssh-agent npm",
+		"omzPlugins": "https://github.com/zsh-users/zsh-autosuggestions",
+		"username": "root"
+	}
+}
+}
