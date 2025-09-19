@@ -33,5 +33,7 @@
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19",
     "typescript": "^5.9.2"
-  }
+  },
+  "packageManager": "bun@1.1.0",
+  "engines": { "node": ">=18" }
 }

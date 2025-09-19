@@ -1,0 +1,11 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "bun run build",
+  "installCommand": "bun install",
+  "outputDirectory": ".",
+  "functions": {
+    "app/api/**": {
+      "runtime": "edge"
+    }
+  }
+}
