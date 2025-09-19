@@ -94,6 +94,11 @@ function parseArgs(): Partial<Bun.BuildConfig> {
   return config;
 }
 
+
+
+
+
+
 const formatFileSize = (bytes: number): string => {
   const units = ["B", "KB", "MB", "GB"];
   let size = bytes;
@@ -154,3 +159,16 @@ console.table(outputTable);
 const buildTime = (end - start).toFixed(2);
 
 console.log(`\n✅ Build completed in ${buildTime}ms\n`);
+
+// launch WS server when --serve is passed
+const serve = (cliConfig as any).serve === true;
+if (serve) {
+  console.log("🚀 Starting WebSocket server via Bun...");
+  const p = Bun.spawn(["bun", "run", "src/server.ts"], {
+    stdout: "inherit",
+    stderr: "inherit",
+    env: { ...process.env, WS_PORT: process.env.WS_PORT ?? "3001" },
+  });
+  process.on("SIGINT", () => { try { p.kill(); } catch {} process.exit(0); });
+  await p.exited;
+}

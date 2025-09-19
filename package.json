@@ -4,10 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-     "dev": "bun run build.ts --outdir=dist --sourcemap=inline & bun run server",
-     "server": "bun src/server.ts",
-     "build": "bun run build.ts --outdir=dist",
-     "start": "bun run build && bun run server"
+    "dev:web": "NEXT_DISABLE_AUTO_INSTALL=1 next dev -p 3000",
+    "dev:ws": "WS_PORT=3001 bun run src/server.ts",
+    "dev": "bun run scripts/dev-all.ts",
+    "build:web": "NEXT_DISABLE_AUTO_INSTALL=1 next build",
+    "start:web": "NEXT_DISABLE_AUTO_INSTALL=1 next start -p 3000",
+    "build:static": "bun run build.ts",
+    "build:static:serve": "bun run build.ts --serve"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.7",

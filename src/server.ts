@@ -1,4 +1,5 @@
 #!/usr/bin/env bun
+
 import { WORLD_WIDTH, WORLD_HEIGHT, homeRectForPlayer, TokenBucket, type ClientToServer, type Plant, type PlantType, type ServerToClient, type PlayerState } from './shared/protocol';
 import { readFileSync } from 'fs';
 import { existsSync } from 'fs';
@@ -12,6 +13,8 @@ function generatePlayerId(): string {
 
 // Bun types: ServerWebSocket is provided at runtime; declare a minimal alias for TS if not present.
 type ServerWS<T = unknown> = any; // fallback minimal type
+
+const PORT = Number(process.env.WS_PORT ?? process.env.PORT ?? 3001); // added
 
 interface ClientSession {
   id: string;
@@ -96,7 +99,7 @@ function handleAction(client: ClientSession, msg: ClientToServer) {
 }
 
 Bun.serve<{ id: string }, any>({
-  port: 3000,
+  port: PORT, // use env-configured port
   fetch(req, server) {
     const { pathname } = new URL(req.url);
     if (pathname === '/ws') {
@@ -175,4 +178,4 @@ setInterval(() => {
   broadcast({ type: 'delta', payload: { tiles } as any });
 }, TICK_MS);
 
-console.log('Garden server listening on ws://localhost:3000/ws');
+console.log(`Garden server listening on ws://localhost:${PORT}/ws`);
