@@ -1,6 +1,27 @@
 // Shared protocol & data model types for Multiplayer Garden Canvas prototype
 // Document version 0.1 (prototype planning)
 
+export interface Tile { x: number; y: number; plant?: Plant }
+
+
+
+
+// Player configuration
+export interface PlayerConfig {
+  maxPlants: number; // max number of plants player can have at once
+  rateLimit: RateLimiterConfig; // rate limit for plant/clear actions
+}
+
+export interface PlayerProfile {
+  id: string;
+  name: string;
+  color: string; // e.g. "#ff0000"
+  skin: string;  // e.g. "elf", "gnome", "human"
+  config: PlayerConfig;
+}
+
+
+
 export type PlantType = 'seed' | 'flower' | 'tree';
 
 export interface Plant {
@@ -33,9 +54,9 @@ export interface DeltaPayload { tiles: DeltaTile[] }
 export interface ErrorPayload { code: string; message: string }
 export interface PongPayload { t: number }
 
-export interface PlayerState { id: string; x: number; y: number; home: Rect }
+export interface PlayerState { id: PlayerProfile["id"]; x: number; y: number; home: Rect }
 export interface PlayersSnapshotPayload { players: PlayerState[] }
-export interface PlayerDeltaPayload { id: string; x: number; y: number }
+export interface PlayerDeltaPayload { id: PlayerProfile["id"]; x: number; y: number }
 export interface MoveActionPayload { dx: number; dy: number }
 
 // Client -> Server messages
@@ -66,11 +87,11 @@ export function isClientToServer(msg: any): msg is ClientToServer {
   return msg && typeof msg === 'object' && typeof msg.type === 'string';
 }
 
-export const WORLD_WIDTH = 10000;
-export const WORLD_HEIGHT = 10000;
+export const WORLD_WIDTH = 50;
+export const WORLD_HEIGHT = 50;
 
 // Home plot size (prototype fixed)
-export const HOME_SIZE = 8; // 8x8 rectangle
+export const HOME_SIZE = 20; // 8x8 rectangle
 
 export function homeRectForPlayer(playerId: string): Rect {
   // Simple deterministic hash -> position within world bounds minus home size

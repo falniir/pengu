@@ -13,7 +13,9 @@ interface CellProps { x: number; y: number; plant?: { type: PlantType; owner: st
 const Cell: React.FC<CellProps> = ({ x, y, plant, isHome, isOwnedPlant, isPlayer, playersHere, onPrimary, showDots }) => {
   const color = plant ? palette[plant.type] : 'transparent';
   const base = plant ? icons[plant.type] : (showDots ? '·' : '');
-  const playerOverlay = isPlayer ? '🧍' : (playersHere.length > 0 ? '👥' : '');
+const isSoloOther = !isPlayer && playersHere.length === 1;
+const showPlayerIcon = isPlayer || isSoloOther; // show single person when exactly one player (you or another)
+const showGroup = playersHere.length > 1;       // 2+ players on the tile
   const homeTint = !plant && isHome ? 'rgba(56,189,248,0.08)' : undefined; // cyan-ish tint
   return (
     <div
@@ -28,9 +30,28 @@ const Cell: React.FC<CellProps> = ({ x, y, plant, isHome, isOwnedPlant, isPlayer
         boxShadow: isPlayer ? '0 0 4px 2px rgba(252,211,77,0.6)' : undefined,
         transition: 'background 120ms',
         userSelect: 'none'
-      }}>
+      }}> 
       {base}
-      {playerOverlay && <span style={{ position: 'absolute', inset: 0, fontSize: 12, lineHeight: CELL_SIZE + 'px' }}>{playerOverlay}</span>}
+      {showGroup && (
+        <span style={{
+          position: 'absolute',
+          left: 2,
+          top: 2,
+          fontSize: 12,
+          lineHeight: CELL_SIZE + 'px',
+          pointerEvents: 'none'
+        }}>👥</span>
+      )}
+      {showPlayerIcon && (
+        <span style={{
+          position: 'absolute',
+          right: 2,
+          bottom: 2,
+          fontSize: 12,
+          lineHeight: CELL_SIZE + 'px',
+          pointerEvents: 'none'
+        }}>🧍</span>
+      )}
     </div>
   );
 };
@@ -76,7 +97,10 @@ export const Grid: React.FC = () => {
         const isHome = home ? (x >= home.x && y >= home.y && x < home.x + home.w && y < home.y + home.h) : false;
         const isPlayer = myPos && x === myPos.x && y === myPos.y;
         const isOwnedPlant = plantData?.owner === playerId;
-  const playersHere = (Object.values(players) as any[]).filter((p: any) => p.x === x && p.y === y && p.id !== playerId).map((p: any) => p.id);
+        //include everyone, including self
+         const playersHere = (Object.values(players) as any[])
+           .filter((p: any) => p.x === x && p.y === y) // include everyone, even me
+           .map((p: any) => p.id);
         row.push(<Cell key={k} x={x} y={y} plant={plantData} isHome={isHome} isOwnedPlant={isOwnedPlant} isPlayer={!!isPlayer} playersHere={playersHere} showDots={showDots} onPrimary={() => {
           if (plantMode === 'clear') {
             if (plantData && plantData.owner === playerId) clear(x, y);
