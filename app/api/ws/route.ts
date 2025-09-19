@@ -12,6 +12,9 @@ type Msg =
 declare global {
   // eslint-disable-next-line no-var
   var __WS_CLIENTS: Set<WebSocket> | undefined;
+  interface ResponseInit {
+    webSocket?: WebSocket;
+  }
 }
 
 const clients = (globalThis.__WS_CLIENTS ??= new Set<WebSocket>());
@@ -30,7 +33,9 @@ export function GET(req: Request): Response {
     return new Response("Upgrade Required", { status: 426 });
   }
 
-  const pair = new WebSocketPair() as unknown as { 0: WebSocket; 1: WebSocket };
+  type ServerWebSocket = WebSocket & { accept(): void };
+
+  const pair = new (globalThis as any).WebSocketPair() as unknown as { 0: WebSocket; 1: ServerWebSocket };
   const client = pair[0];
   const server = pair[1];
 
