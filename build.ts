@@ -160,14 +160,20 @@ const buildTime = (end - start).toFixed(2);
 
 console.log(`\n✅ Build completed in ${buildTime}ms\n`);
 
-// launch WS server when --serve is passed
-const serve = (cliConfig as any).serve === true;
-if (serve) {
-  console.log("🚀 Starting WebSocket server via Bun...");
+// Respect CI/Vercel: never spawn a WS server there.
+// Locally, allow --serve to launch the Bun WS server for testing.
+const wantServe = (cliConfig as any).serve === true;
+const inCI = !!process.env.CI || !!process.env.VERCEL;
+
+if (wantServe && inCI) {
+  console.log("ℹ️ Skipping Bun WebSocket server in CI/Vercel. Use the Edge WS at /api/ws in production.");
+} else if (wantServe) {
+  console.log("🚀 Starting local WebSocket server via Bun (dev only)...");
+  const wsPort = process.env.WS_PORT ?? "3001";
   const p = Bun.spawn(["bun", "run", "src/server.ts"], {
     stdout: "inherit",
     stderr: "inherit",
-    env: { ...process.env, WS_PORT: process.env.WS_PORT ?? "3001" },
+    env: { ...process.env, WS_PORT: wsPort, TMPDIR: process.env.TMPDIR ?? `${process.cwd()}/.tmp` },
   });
   process.on("SIGINT", () => { try { p.kill(); } catch {} process.exit(0); });
   await p.exited;
